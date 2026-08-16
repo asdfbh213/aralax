@@ -264,7 +264,10 @@ h3 {
 
 .product-card {
   position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
   min-width: 0;
+  min-height: 566px;
   scroll-snap-align: start;
   border: 1px solid var(--line);
   background: var(--surface);
@@ -318,7 +321,8 @@ h3 {
 
 .product-body {
   display: grid;
-  min-height: 228px;
+  grid-template-rows: auto minmax(58px, auto) auto 1fr auto auto;
+  min-height: 278px;
   padding: 18px;
 }
 
@@ -352,7 +356,8 @@ h3 {
 }
 
 .product-bottom {
-  margin-top: auto;
+  align-self: end;
+  min-height: 50px;
 }
 
 .product-bottom strong {
@@ -365,7 +370,8 @@ h3 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 18px;
+  align-self: end;
+  margin-top: 14px;
 }
 
 .cart-panel {

@@ -15,31 +15,31 @@ const categories: Record<Category, string> = {
 }
 
 const products = [
-  { category: 'protection', name: 'Нитро-виниловые перчатки', details: 'Для клиник, HoReCa и сервиса. Размеры S, M, L.', price: 'от 1 100 тг' },
-  { category: 'protection', name: 'Нитриловые перчатки', details: 'Плотные одноразовые перчатки для регулярных закупок.', price: 'от 1 800 тг' },
-  { category: 'protection', name: 'Резиновые хозяйственные перчатки', details: 'Для клининга, кухни и ежедневной уборки.', price: 'от 2 600 тг' },
-  { category: 'paper', name: 'Салфетки Z-сложения', details: '2 слоя, разная плотность и формат пачки.', price: 'от 250 тг' },
-  { category: 'paper', name: 'Туалетная бумага Jumbo', details: '2 слоя, разный метраж для диспенсеров.', price: 'от 420 тг' },
-  { category: 'paper', name: 'Полотенца “Великан”', details: '2 слоя, рулоны для интенсивного расхода.', price: 'от 900 тг' },
-  { category: 'packaging', name: 'Пакеты-майки', details: 'Белые и черные, разные размеры под задачи бизнеса.', price: 'от 300 тг' },
-  { category: 'packaging', name: 'Этикет-лента', details: 'Для весов, касс и маркировки товаров.', price: 'от 420 тг' },
-  { category: 'packaging', name: 'Чековая лента', details: 'Популярные размеры 57 и 80 мм.', price: 'от 120 тг' },
-  { category: 'household', name: 'Мусорные пакеты', details: 'Объемы 30-240 л для офисов, клининга и HoReCa.', price: 'по запросу' },
+  { category: 'protection', name: 'Перчатки нитро-винил Wally Plastic', details: 'черные / голубые · S, M, L · 50 пар', price: 'от 1 250 тг' },
+  { category: 'protection', name: 'Перчатки нитрил Prime Med', details: 'голубые · S, M, L · 50 пар', price: 'от 2 500 тг' },
+  { category: 'protection', name: 'Перчатки резиновые плотные', details: '90-100 гр · S, M, L · 10 пар', price: 'от 3 200 тг' },
+  { category: 'paper', name: 'Салфетки Z-сложение', details: '2 слоя · 120, 150, 200 листов', price: 'от 250 тг' },
+  { category: 'paper', name: 'Туалетная бумага Jumbo', details: '2 слоя · 100, 120, 150 м', price: 'от 420 тг' },
+  { category: 'paper', name: 'Бумажное полотенце «Великан»', details: '2 слоя · 100 м · рулон', price: 'от 900 тг' },
+  { category: 'packaging', name: 'Пакеты-майки', details: 'белые и черные · разные размеры', price: 'от 300 тг' },
+  { category: 'packaging', name: 'Этикет-лента', details: 'для весов и касс · 9 размеров', price: 'от 420 тг' },
+  { category: 'packaging', name: 'Чековая лента', details: '57 и 80 мм · разные намотки', price: 'от 120 тг' },
+  { category: 'household', name: 'Мусорные пакеты', details: '30, 60, 120, 160, 240 л', price: 'по запросу' },
 ] as const
 
 const segments = [
-  'Клиники и лаборатории',
+  'Медицинские клиники',
   'Ветеринарные клиники',
-  'Школы и детские сады',
+  'Частные школы и сады',
   'Рестораны и кофейни',
   'Фитнес и beauty',
-  'Офисы и БЦ',
-  'Клининговые компании',
+  'Офисы и бизнес-центры',
+  'Клининг',
   'Производства',
   'Розничные сети',
 ]
 
-const steps = ['Заявка', 'Подбор', 'Расчет', 'Согласование', 'Поставка']
+const steps = ['Принимаем заявку', 'Уточняем объем', 'Подбираем позиции', 'Отправляем расчет', 'Согласуем поставку']
 
 function App() {
   const [active, setActive] = useState<Category>('all')
@@ -64,13 +64,9 @@ function App() {
   }
 
   return (
-    <main className="site-shell">
-      <div className="orb orb-one" />
-      <div className="orb orb-two" />
-      <div className="stars" />
-
+    <main>
       <header className="site-header">
-        <a className="brand" href="#top"><span>D</span> DESIVE</a>
+        <a className="brand" href="#top">DESIVE</a>
         <nav>
           <a href="#catalog">Каталог</a>
           <a href="#process">Процесс</a>
@@ -82,47 +78,51 @@ function App() {
 
       <section className="hero" id="top">
         <div className="hero-content">
-          <p className="eyebrow">Алматы • B2B supply • ИП DESIVE</p>
-          <h1>Премиальная поставка расходников для бизнеса</h1>
+          <p className="eyebrow">Алматы · B2B поставки · WhatsApp +7 777 131 18 88</p>
+          <h1>Расходные материалы для организаций в строгом B2B-формате</h1>
           <p className="hero-text">
-            Перчатки, бумажная продукция, упаковка, чековая лента и хозтовары.
-            DESIVE считает закупку под ваш объем и быстро отправляет персональное КП.
+            Перчатки, бумажная продукция, пакеты, этикет-лента, чековая лента и хозтовары.
+            DESIVE считает закупку под ваш объем и быстро отправляет персональное коммерческое предложение.
           </p>
           <div className="hero-actions">
             <a className="primary" href="#contacts">Оставить заявку</a>
             <a className="secondary" href="#catalog">Смотреть каталог</a>
           </div>
-          <div className="badges">
-            <span>БИН 080513552207</span>
-            <span>WhatsApp +7 777 131 18 88</span>
-          </div>
         </div>
-        <aside className="astral-panel">
-          <div className="cube-scene">
-            <span className="cube cube-a" />
-            <span className="cube cube-b" />
-            <span className="cube cube-c" />
-            <span className="ring" />
+        <aside className="quote-panel">
+          <div>
+            <span>01</span>
+            <strong>Расчет под закупку</strong>
+            <p>Финальная цена зависит от партии, наличия, НДС и условий поставки.</p>
           </div>
-          <h2>Direct supplier model</h2>
-          <p>Не жесткий прайс, а расчет под объем, наличие и условия поставки.</p>
+          <div>
+            <span>02</span>
+            <strong>Минимум лишних шагов</strong>
+            <p>Заявка открывается в WhatsApp без регистрации, личного кабинета и сложной формы.</p>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>Регулярные поставки</strong>
+            <p>Подходит клиникам, HoReCa, офисам, сетям, производствам и клинингу.</p>
+          </div>
         </aside>
       </section>
 
-      <section className="metrics">
+      <section className="metric-strip" aria-label="Преимущества">
         <div><strong>30+</strong><span>ходовых позиций</span></div>
         <div><strong>1 день</strong><span>на первичный расчет</span></div>
-        <div><strong>Алматы</strong><span>основной регион</span></div>
-        <div><strong>WhatsApp</strong><span>без регистрации</span></div>
+        <div><strong>Алматы</strong><span>основной регион поставки</span></div>
+        <div><strong>WhatsApp</strong><span>быстрая заявка</span></div>
       </section>
 
       <section className="section" id="catalog">
         <div className="section-head">
           <div>
             <p className="section-label">Каталог</p>
-            <h2>Ассортимент под регулярные закупки</h2>
+            <h2>Основной ассортимент</h2>
+            <p>Цены указаны как ориентир. Точную стоимость под объем лучше запросить отдельно.</p>
           </div>
-          <div className="filters">
+          <div className="filters" aria-label="Фильтр каталога">
             {(Object.keys(categories) as Category[]).map((category) => (
               <button key={category} className={active === category ? 'active' : ''} onClick={() => setActive(category)}>
                 {categories[category]}
@@ -130,10 +130,14 @@ function App() {
             ))}
           </div>
         </div>
+
         <div className="catalog-grid">
           {visibleProducts.map((product) => (
             <article className="product-card" key={product.name}>
-              <span>{categories[product.category]}</span>
+              <div className="product-meta">
+                <span>{categories[product.category]}</span>
+                <small><i />В наличии</small>
+              </div>
               <h3>{product.name}</h3>
               <p>{product.details}</p>
               <strong>{product.price}</strong>
@@ -144,31 +148,55 @@ function App() {
       </section>
 
       <section className="section process" id="process">
-        <p className="section-label">Как работаем</p>
-        <h2>Быстрая схема без лишней бюрократии</h2>
+        <div>
+          <p className="section-label">Процесс</p>
+          <h2>Понятная схема работы</h2>
+        </div>
         <div className="steps">
           {steps.map((step, index) => (
-            <div key={step}><span>{String(index + 1).padStart(2, '0')}</span><p>{step}</p></div>
+            <div key={step}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <p>{step}</p>
+            </div>
           ))}
         </div>
       </section>
 
       <section className="section segments" id="segments">
-        <p className="section-label">Кому подходит</p>
-        <h2>Для компаний, где важны наличие, цена и документы</h2>
+        <p className="section-label">Клиенты</p>
+        <h2>Для кого подходит DESIVE</h2>
         <div className="segments-grid">
           {segments.map((segment) => <span key={segment}>{segment}</span>)}
+        </div>
+      </section>
+
+      <section className="section comparison">
+        <p className="section-label">Почему мы</p>
+        <h2>Строго, быстро, под объем</h2>
+        <div className="comparison-grid">
+          <article>
+            <h3>Широкий список товаров</h3>
+            <p>Бумага, защита, упаковка, ленты и хозтовары в одном запросе.</p>
+          </article>
+          <article>
+            <h3>Персональное КП</h3>
+            <p>Не заставляем выбирать из шаблонного прайса, считаем под закупку.</p>
+          </article>
+          <article>
+            <h3>Документы по запросу</h3>
+            <p>Для крупных клиентов предоставим сертификаты и реквизиты.</p>
+          </article>
         </div>
       </section>
 
       <section className="section contacts" id="contacts">
         <div>
           <p className="section-label">Заявка</p>
-          <h2>Получить персональный расчет</h2>
-          <p>Напишите, что нужно и примерный объем. Заявка сразу откроется в WhatsApp.</p>
+          <h2>Получить расчет</h2>
+          <p>Напишите, что нужно и примерный объем. Мы подготовим коммерческое предложение и ответим в WhatsApp.</p>
           <div className="requisites">
             <a href={`https://wa.me/${phone}`} target="_blank">WhatsApp +7 777 131 18 88</a>
-            <span>ИП DESIVE • Республика Казахстан, г. Алматы</span>
+            <span>ИП DESIVE · БИН 080513552207 · Республика Казахстан, г. Алматы</span>
           </div>
         </div>
         <form onSubmit={sendRequest}>

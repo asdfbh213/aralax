@@ -1,66 +1,307 @@
 import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
 import './App.css'
 
-type Category = 'all' | 'paper' | 'protection' | 'packaging' | 'household'
+type Category = 'all' | 'gloves' | 'paper' | 'bags' | 'labels'
+
+type Product = {
+  id: string
+  category: Exclude<Category, 'all'>
+  name: string
+  image: string
+  price: number | null
+  unit: string
+  pack: string
+  badge: string
+}
+
+type Cart = Record<string, number>
 
 const phone = '77771311888'
 
 const categories: Record<Category, string> = {
   all: 'Все',
+  gloves: 'Перчатки',
   paper: 'Бумага',
-  protection: 'Защита',
-  packaging: 'Упаковка',
-  household: 'Хозтовары',
+  bags: 'Пакеты',
+  labels: 'Лента',
 }
 
-const products = [
-  { category: 'protection', name: 'Перчатки нитро-винил Wally Plastic', details: 'черные / голубые · S, M, L · 50 пар', price: 'от 1 250 тг' },
-  { category: 'protection', name: 'Перчатки нитрил Prime Med', details: 'голубые · S, M, L · 50 пар', price: 'от 2 500 тг' },
-  { category: 'protection', name: 'Перчатки резиновые плотные', details: '90-100 гр · S, M, L · 10 пар', price: 'от 3 200 тг' },
-  { category: 'paper', name: 'Салфетки Z-сложение', details: '2 слоя · 120, 150, 200 листов', price: 'от 250 тг' },
-  { category: 'paper', name: 'Туалетная бумага Jumbo', details: '2 слоя · 100, 120, 150 м', price: 'от 420 тг' },
-  { category: 'paper', name: 'Бумажное полотенце «Великан»', details: '2 слоя · 100 м · рулон', price: 'от 900 тг' },
-  { category: 'packaging', name: 'Пакеты-майки', details: 'белые и черные · разные размеры', price: 'от 300 тг' },
-  { category: 'packaging', name: 'Этикет-лента', details: 'для весов и касс · 9 размеров', price: 'от 420 тг' },
-  { category: 'packaging', name: 'Чековая лента', details: '57 и 80 мм · разные намотки', price: 'от 120 тг' },
-  { category: 'household', name: 'Мусорные пакеты', details: '30, 60, 120, 160, 240 л', price: 'по запросу' },
-] as const
-
-const segments = [
-  'Медицинские клиники',
-  'Ветеринарные клиники',
-  'Частные школы и сады',
-  'Рестораны и кофейни',
-  'Фитнес и beauty',
-  'Офисы и бизнес-центры',
-  'Клининг',
-  'Производства',
-  'Розничные сети',
+const products: Product[] = [
+  {
+    id: 'black-vinyl-nitrile-gloves',
+    category: 'gloves',
+    name: 'Перчатки винил/нитрил, черные',
+    image: '/images/products/black-vinyl-nitrile-gloves.jpg',
+    price: 1250,
+    unit: 'упаковка',
+    pack: '100 шт · размер M',
+    badge: 'Powder free',
+  },
+  {
+    id: 'blue-vinyl-nitrile-gloves',
+    category: 'gloves',
+    name: 'Перчатки винил/нитрил, голубые',
+    image: '/images/products/blue-vinyl-nitrile-gloves.jpg',
+    price: 1250,
+    unit: 'упаковка',
+    pack: '100 шт · размер M',
+    badge: 'Latex free',
+  },
+  {
+    id: 'verde-vita-black-gloves',
+    category: 'gloves',
+    name: 'Verde Vita нитро-винил, черные',
+    image: '/images/products/verde-vita-black-gloves.jpg',
+    price: 1250,
+    unit: 'упаковка',
+    pack: '100 шт · размер M',
+    badge: 'Универсальные',
+  },
+  {
+    id: 'prime-med-nitrile-gloves',
+    category: 'gloves',
+    name: 'Prime Med нитриловые, голубые',
+    image: '/images/products/prime-med-nitrile-gloves.jpg',
+    price: 2500,
+    unit: 'упаковка',
+    pack: '100 шт · размер M',
+    badge: 'EN ISO',
+  },
+  {
+    id: 'mediok-nitrile-gloves',
+    category: 'gloves',
+    name: 'mediOk нитриловые перчатки',
+    image: '/images/products/mediok-nitrile-gloves.jpg',
+    price: 2300,
+    unit: 'упаковка',
+    pack: '50 пар · размер M',
+    badge: 'AQL 1.5',
+  },
+  {
+    id: 'latex-household-gloves',
+    category: 'gloves',
+    name: 'Латексные хозяйственные перчатки',
+    image: '/images/products/latex-household-gloves.jpg',
+    price: 3200,
+    unit: '10 пар',
+    pack: 'плотные · желтые',
+    badge: 'Плотные',
+  },
+  {
+    id: 'z-fold-napkins',
+    category: 'paper',
+    name: 'Салфетки Z-сложения',
+    image: '/images/products/z-fold-napkins.jpg',
+    price: 250,
+    unit: 'пачка',
+    pack: '120 / 150 / 200 листов',
+    badge: '2 слоя',
+  },
+  {
+    id: 'jumbo-toilet-paper-rolls',
+    category: 'paper',
+    name: 'Туалетная бумага Jumbo',
+    image: '/images/products/jumbo-toilet-paper-rolls.jpg',
+    price: 420,
+    unit: 'рулон',
+    pack: '100 / 120 / 150 м',
+    badge: 'Jumbo',
+  },
+  {
+    id: 'toilet-paper-roll',
+    category: 'paper',
+    name: 'Туалетная бумага в рулоне',
+    image: '/images/products/toilet-paper-roll.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: 'для диспенсеров',
+    badge: 'Опт',
+  },
+  {
+    id: 'trash-bags-30l',
+    category: 'bags',
+    name: 'Мусорные пакеты 30 л',
+    image: '/images/products/trash-bags-30l.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: 'черные · прочные',
+    badge: '30 л',
+  },
+  {
+    id: 'trash-bags-60l',
+    category: 'bags',
+    name: 'Мусорные пакеты 60 л',
+    image: '/images/products/trash-bags-60l.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: 'черные · KZ',
+    badge: '60 л',
+  },
+  {
+    id: 'trash-bags-120l',
+    category: 'bags',
+    name: 'Пакеты для мусора 120 л',
+    image: '/images/products/trash-bags-120l.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: '10 шт · 120 л',
+    badge: 'KZ-Арман',
+  },
+  {
+    id: 'trash-bags-160l',
+    category: 'bags',
+    name: 'Пакеты для мусора 160 л',
+    image: '/images/products/trash-bags-160l.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: '5 шт · 100x90 см',
+    badge: '160 л',
+  },
+  {
+    id: 'trash-bags-240l',
+    category: 'bags',
+    name: 'Пакеты для мусора 240 л',
+    image: '/images/products/trash-bags-240l.jpg',
+    price: null,
+    unit: 'рулон',
+    pack: '5 шт · 100x140 см',
+    badge: '240 л',
+  },
+  {
+    id: 'eco-bags-3500',
+    category: 'bags',
+    name: 'Eco Kz пакеты 3500',
+    image: '/images/products/eco-bags-3500.jpg',
+    price: null,
+    unit: 'упаковка',
+    pack: '260x450 мм',
+    badge: 'Eco Kz',
+  },
+  {
+    id: 'eco-bags-3000',
+    category: 'bags',
+    name: 'Eco Kz пакеты 3000',
+    image: '/images/products/eco-bags-3000.jpg',
+    price: null,
+    unit: 'упаковка',
+    pack: '260x450 мм',
+    badge: 'Eco Kz',
+  },
+  {
+    id: 'eco-bags-2500',
+    category: 'bags',
+    name: 'Eco Kz пакеты 2500',
+    image: '/images/products/eco-bags-2500.jpg',
+    price: null,
+    unit: 'упаковка',
+    pack: '260x450 мм',
+    badge: 'Eco Kz',
+  },
+  {
+    id: 'eco-bags-2000',
+    category: 'bags',
+    name: 'Eco Kz пакеты 2000',
+    image: '/images/products/eco-bags-2000.jpg',
+    price: null,
+    unit: 'упаковка',
+    pack: '260x450 мм',
+    badge: 'Eco Kz',
+  },
+  {
+    id: 'black-tshirt-bag',
+    category: 'bags',
+    name: 'Пакет-майка черный',
+    image: '/images/products/black-tshirt-bag.jpg',
+    price: 300,
+    unit: 'пачка',
+    pack: 'размер по запросу',
+    badge: 'Майка',
+  },
+  {
+    id: 'white-tshirt-bag',
+    category: 'bags',
+    name: 'Пакет-майка белый',
+    image: '/images/products/white-tshirt-bag.jpg',
+    price: 300,
+    unit: 'пачка',
+    pack: 'размер по запросу',
+    badge: 'Майка',
+  },
+  {
+    id: 'label-roll-yellow',
+    category: 'labels',
+    name: 'Этикет-лента',
+    image: '/images/products/label-roll-yellow.jpg',
+    price: 420,
+    unit: 'рулон',
+    pack: 'для весов и маркировки',
+    badge: 'Термо',
+  },
+  {
+    id: 'receipt-tape-roll',
+    category: 'labels',
+    name: 'Чековая лента',
+    image: '/images/products/receipt-tape-roll.jpg',
+    price: 120,
+    unit: 'рулон',
+    pack: 'кассовая термолента',
+    badge: '57 / 80 мм',
+  },
 ]
 
-const steps = ['Принимаем заявку', 'Уточняем объем', 'Подбираем позиции', 'Отправляем расчет', 'Согласуем поставку']
+const segments = ['Кафе и рестораны', 'Магазины', 'Клиники', 'Доставка еды', 'Клининг', 'Офисы']
+
+function formatPrice(price: number | null) {
+  return price ? `от ${price.toLocaleString('ru-RU')} тг` : 'цена по запросу'
+}
 
 function App() {
   const [active, setActive] = useState<Category>('all')
-  const visibleProducts = useMemo(
-    () => products.filter((product) => active === 'all' || product.category === active),
-    [active],
-  )
+  const [query, setQuery] = useState('')
+  const [cart, setCart] = useState<Cart>({})
+  const [favorites, setFavorites] = useState<string[]>([])
 
-  function sendRequest(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const message = [
-      'Заявка с сайта DESIVE',
-      `Компания: ${data.get('company')}`,
-      `Сфера: ${data.get('segment')}`,
-      `Что нужно: ${data.get('need')}`,
-      `Объем: ${data.get('volume')}`,
-      `Контакт: ${data.get('contact')}`,
-    ].join('\n')
+  const visibleProducts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    return products.filter((product) => {
+      const matchesCategory = active === 'all' || product.category === active
+      const matchesQuery = !normalizedQuery || `${product.name} ${product.pack} ${product.badge}`.toLowerCase().includes(normalizedQuery)
+      return matchesCategory && matchesQuery
+    })
+  }, [active, query])
 
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+  const cartItems = products.filter((product) => cart[product.id])
+  const cartCount = Object.values(cart).reduce((sum, value) => sum + value, 0)
+  const total = cartItems.reduce((sum, product) => sum + (product.price ?? 0) * cart[product.id], 0)
+
+  function addToCart(id: string) {
+    setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }))
+  }
+
+  function changeQuantity(id: string, delta: number) {
+    setCart((current) => {
+      const nextValue = (current[id] ?? 0) + delta
+      const next = { ...current }
+      if (nextValue <= 0) delete next[id]
+      else next[id] = nextValue
+      return next
+    })
+  }
+
+  function toggleFavorite(id: string) {
+    setFavorites((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
+  }
+
+  function openWhatsApp(product?: Product) {
+    const lines = product
+      ? [`Здравствуйте! Хочу заказать: ${product.name}`, `Фасовка: ${product.pack}`, `Цена на сайте: ${formatPrice(product.price)}`]
+      : [
+        'Здравствуйте! Хочу оформить заказ с сайта DESIVE.',
+        ...cartItems.map((item) => `- ${item.name}, ${cart[item.id]} ${item.unit}, ${formatPrice(item.price)}`),
+        total ? `Ориентировочная сумма: ${total.toLocaleString('ru-RU')} тг` : 'По части позиций нужна цена по запросу.',
+      ]
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -69,152 +310,156 @@ function App() {
         <a className="brand" href="#top">DESIVE</a>
         <nav>
           <a href="#catalog">Каталог</a>
-          <a href="#process">Процесс</a>
-          <a href="#segments">Клиенты</a>
-          <a href="#contacts">Заявка</a>
+          <a href="#delivery">Доставка</a>
+          <a href="#contacts">Контакты</a>
         </nav>
-        <a className="header-action" href="#contacts">Получить расчет</a>
+        <button className="cart-pill" type="button" onClick={() => document.getElementById('cart')?.scrollIntoView({ behavior: 'smooth' })}>
+          Корзина · {cartCount}
+        </button>
       </header>
 
       <section className="hero" id="top">
-        <div className="hero-content">
-          <p className="eyebrow">Алматы · B2B поставки · WhatsApp +7 777 131 18 88</p>
-          <h1>Расходные материалы для организаций в строгом B2B-формате</h1>
-          <p className="hero-text">
-            Перчатки, бумажная продукция, пакеты, этикет-лента, чековая лента и хозтовары.
-            DESIVE считает закупку под ваш объем и быстро отправляет персональное коммерческое предложение.
+        <div className="hero-copy">
+          <p className="eyebrow">Алматы · расходные материалы для бизнеса</p>
+          <h1>DESIVE</h1>
+          <p>
+            Перчатки, бумажная продукция, пакеты, этикет-лента и чековая лента для кафе, магазинов,
+            клиник, доставки и клининга. Заказ оформляется напрямую в WhatsApp.
           </p>
           <div className="hero-actions">
-            <a className="primary" href="#contacts">Оставить заявку</a>
-            <a className="secondary" href="#catalog">Смотреть каталог</a>
+            <a className="primary" href="#catalog">Смотреть товары</a>
+            <button className="secondary" type="button" onClick={() => openWhatsApp()}>Написать в WhatsApp</button>
           </div>
         </div>
-        <aside className="quote-panel">
-          <div>
-            <span>01</span>
-            <strong>Расчет под закупку</strong>
-            <p>Финальная цена зависит от партии, наличия, НДС и условий поставки.</p>
-          </div>
-          <div>
-            <span>02</span>
-            <strong>Минимум лишних шагов</strong>
-            <p>Заявка открывается в WhatsApp без регистрации, личного кабинета и сложной формы.</p>
-          </div>
-          <div>
-            <span>03</span>
-            <strong>Регулярные поставки</strong>
-            <p>Подходит клиникам, HoReCa, офисам, сетям, производствам и клинингу.</p>
-          </div>
-        </aside>
+        <div className="hero-showcase">
+          {products.slice(0, 4).map((product) => (
+            <img key={product.id} src={product.image} alt={product.name} />
+          ))}
+        </div>
       </section>
 
-      <section className="metric-strip" aria-label="Преимущества">
-        <div><strong>30+</strong><span>ходовых позиций</span></div>
-        <div><strong>1 день</strong><span>на первичный расчет</span></div>
-        <div><strong>Алматы</strong><span>основной регион поставки</span></div>
-        <div><strong>WhatsApp</strong><span>быстрая заявка</span></div>
+      <section className="category-strip" aria-label="Категории">
+        {(Object.keys(categories) as Category[]).map((category) => (
+          <button key={category} className={active === category ? 'active' : ''} type="button" onClick={() => setActive(category)}>
+            {categories[category]}
+          </button>
+        ))}
       </section>
 
-      <section className="section" id="catalog">
+      <section className="section catalog-section" id="catalog">
         <div className="section-head">
           <div>
             <p className="section-label">Каталог</p>
-            <h2>Основной ассортимент</h2>
-            <p>Цены указаны как ориентир. Точную стоимость под объем лучше запросить отдельно.</p>
+            <h2>Товары в наличии и под заказ</h2>
           </div>
-          <div className="filters" aria-label="Фильтр каталога">
-            {(Object.keys(categories) as Category[]).map((category) => (
-              <button key={category} className={active === category ? 'active' : ''} onClick={() => setActive(category)}>
-                {categories[category]}
-              </button>
-            ))}
-          </div>
+          <input aria-label="Поиск по каталогу" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск: перчатки, 60 л, чековая..." />
         </div>
 
         <div className="catalog-grid">
           {visibleProducts.map((product) => (
-            <article className="product-card" key={product.name}>
-              <div className="product-meta">
-                <span>{categories[product.category]}</span>
-                <small><i />В наличии</small>
+            <article className="product-card" key={product.id}>
+              <button className={`favorite ${favorites.includes(product.id) ? 'active' : ''}`} type="button" onClick={() => toggleFavorite(product.id)} aria-label="Добавить в избранное">
+                ♥
+              </button>
+              <div className="product-image">
+                <img src={product.image} alt={product.name} loading="lazy" />
               </div>
-              <h3>{product.name}</h3>
-              <p>{product.details}</p>
-              <strong>{product.price}</strong>
-              <a href="#contacts">Запросить точную цену</a>
+              <div className="product-body">
+                <div className="product-meta">
+                  <span>{categories[product.category]}</span>
+                  <small><i />В наличии</small>
+                </div>
+                <h3>{product.name}</h3>
+                <p>{product.pack}</p>
+                <div className="product-bottom">
+                  <strong>{formatPrice(product.price)}</strong>
+                  <span>{product.badge}</span>
+                </div>
+                <div className="product-actions">
+                  <button type="button" onClick={() => addToCart(product.id)}>В корзину</button>
+                  <button type="button" onClick={() => openWhatsApp(product)}>Купить</button>
+                </div>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="section process" id="process">
+      <section className="section cart-section" id="cart">
         <div>
-          <p className="section-label">Процесс</p>
-          <h2>Понятная схема работы</h2>
+          <p className="section-label">Корзина</p>
+          <h2>Быстрый заказ</h2>
+          <p>Добавьте позиции и отправьте заявку в WhatsApp. Менеджер уточнит объем, наличие и финальную цену.</p>
         </div>
-        <div className="steps">
-          {steps.map((step, index) => (
-            <div key={step}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <p>{step}</p>
-            </div>
-          ))}
+        <div className="cart-panel">
+          {cartItems.length === 0 ? (
+            <p className="empty">Корзина пока пустая.</p>
+          ) : (
+            <>
+              {cartItems.map((item) => (
+                <div className="cart-row" key={item.id}>
+                  <img src={item.image} alt={item.name} />
+                  <div>
+                    <strong>{item.name}</strong>
+                    <span>{formatPrice(item.price)}</span>
+                  </div>
+                  <div className="quantity">
+                    <button type="button" onClick={() => changeQuantity(item.id, -1)}>-</button>
+                    <span>{cart[item.id]}</span>
+                    <button type="button" onClick={() => changeQuantity(item.id, 1)}>+</button>
+                  </div>
+                </div>
+              ))}
+              <div className="cart-total">
+                <span>Ориентировочно</span>
+                <strong>{total ? `${total.toLocaleString('ru-RU')} тг` : 'по запросу'}</strong>
+              </div>
+              <button className="checkout" type="button" onClick={() => openWhatsApp()}>Отправить заказ</button>
+            </>
+          )}
         </div>
       </section>
 
-      <section className="section segments" id="segments">
+      <section className="section info-grid" id="delivery">
+        <article>
+          <span>01</span>
+          <h3>Опт и розница</h3>
+          <p>Работаем с разовыми и регулярными закупками для бизнеса.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Алматы</h3>
+          <p>Быстрая обработка заявок и согласование поставки по городу.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Персональный расчет</h3>
+          <p>Финальная цена зависит от объема, упаковки и наличия.</p>
+        </article>
+      </section>
+
+      <section className="section clients">
         <p className="section-label">Клиенты</p>
-        <h2>Для кого подходит DESIVE</h2>
-        <div className="segments-grid">
+        <div>
           {segments.map((segment) => <span key={segment}>{segment}</span>)}
-        </div>
-      </section>
-
-      <section className="section comparison">
-        <p className="section-label">Почему мы</p>
-        <h2>Строго, быстро, под объем</h2>
-        <div className="comparison-grid">
-          <article>
-            <h3>Широкий список товаров</h3>
-            <p>Бумага, защита, упаковка, ленты и хозтовары в одном запросе.</p>
-          </article>
-          <article>
-            <h3>Персональное КП</h3>
-            <p>Не заставляем выбирать из шаблонного прайса, считаем под закупку.</p>
-          </article>
-          <article>
-            <h3>Документы по запросу</h3>
-            <p>Для крупных клиентов предоставим сертификаты и реквизиты.</p>
-          </article>
         </div>
       </section>
 
       <section className="section contacts" id="contacts">
         <div>
-          <p className="section-label">Заявка</p>
-          <h2>Получить расчет</h2>
-          <p>Напишите, что нужно и примерный объем. Мы подготовим коммерческое предложение и ответим в WhatsApp.</p>
-          <div className="requisites">
-            <a href={`https://wa.me/${phone}`} target="_blank">WhatsApp +7 777 131 18 88</a>
-            <span>ИП DESIVE · БИН 080513552207 · Республика Казахстан, г. Алматы</span>
-          </div>
+          <p className="section-label">Контакты</p>
+          <h2>DESIVE, Алматы</h2>
+          <p>Расходные материалы для бизнеса: перчатки, бумага, пакеты, упаковка и лента.</p>
         </div>
-        <form onSubmit={sendRequest}>
-          <input name="company" placeholder="Название компании" required />
-          <select name="segment" defaultValue="" required>
-            <option value="" disabled>Сфера деятельности</option>
-            {segments.map((segment) => <option key={segment}>{segment}</option>)}
-          </select>
-          <textarea name="need" placeholder="Что нужно из ассортимента" rows={4} required />
-          <input name="volume" placeholder="Примерный объем" />
-          <input name="contact" placeholder="Ваш телефон или WhatsApp" required />
-          <button type="submit">Отправить заявку в WhatsApp</button>
-        </form>
+        <div className="contact-actions">
+          <a className="primary" href={`https://wa.me/${phone}`} target="_blank">WhatsApp +7 777 131 18 88</a>
+          <a className="secondary" href="#catalog">Вернуться в каталог</a>
+        </div>
       </section>
 
       <footer>
         <strong>DESIVE</strong>
-        <span>Расходные материалы для бизнеса в Алматы</span>
+        <span>Интернет-магазин расходных материалов · Алматы, Казахстан</span>
       </footer>
 
       <a className="whatsapp" href={`https://wa.me/${phone}`} target="_blank" aria-label="Открыть WhatsApp">WA</a>

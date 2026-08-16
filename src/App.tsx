@@ -252,8 +252,6 @@ const products: Product[] = [
 
 const segments = ['Кафе и рестораны', 'Магазины', 'Клиники', 'Доставка еды', 'Клининг', 'Офисы']
 
-const heroSlides = products.slice(0, 4)
-
 const categoryIcons: Record<Category, string> = {
   all: '•',
   gloves: 'G',
@@ -271,7 +269,6 @@ function App() {
   const [query, setQuery] = useState('')
   const [cart, setCart] = useState<Cart>({})
   const [favorites, setFavorites] = useState<string[]>([])
-  const [activeSlide, setActiveSlide] = useState(0)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
 
@@ -287,14 +284,6 @@ function App() {
   const cartItems = products.filter((product) => cart[product.id])
   const cartCount = Object.values(cart).reduce((sum, value) => sum + value, 0)
   const total = cartItems.reduce((sum, product) => sum + (product.price ?? 0) * cart[product.id], 0)
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length)
-    }, 5000)
-
-    return () => window.clearInterval(timer)
-  }, [])
 
   useEffect(() => {
     if (!isCartOpen) return
@@ -340,13 +329,14 @@ function App() {
   function sendLead(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
+    const company = String(data.get('company') ?? '').trim()
     const name = String(data.get('name') ?? '').trim()
     const contact = String(data.get('contact') ?? '').trim()
 
-    if (!name || !/^\+?\d[\d\s()-]{8,}$/.test(contact)) return
+    if (!company || !name || !/^\+?\d[\d\s()-]{8,}$/.test(contact)) return
 
     setLeadStatus('sending')
-    const message = [`Заявка с сайта DESIVE`, `Имя: ${name}`, `Телефон: ${contact}`].join('\n')
+    const message = [`Заявка с сайта DESIVE`, `Компания: ${company}`, `Имя: ${name}`, `Телефон: ${contact}`].join('\n')
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
     window.setTimeout(() => setLeadStatus('sent'), 420)
   }
@@ -408,27 +398,6 @@ function App() {
             <button className="secondary" type="button" onClick={() => openWhatsApp()}>Написать в WhatsApp</button>
           </div>
         </div>
-        <div className="hero-slider">
-          {heroSlides.map((product, index) => (
-            <img
-              key={product.id}
-              className={index === activeSlide ? 'active' : ''}
-              src={product.image}
-              alt={product.name}
-            />
-          ))}
-          <div className="hero-dots" aria-label="Слайды">
-            {heroSlides.map((product, index) => (
-              <button
-                key={product.id}
-                className={index === activeSlide ? 'active' : ''}
-                type="button"
-                onClick={() => setActiveSlide(index)}
-                aria-label={`Показать слайд ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
       </section>
 
       <section className="category-island" aria-label="Категории товаров">
@@ -452,7 +421,7 @@ function App() {
           <input aria-label="Поиск по каталогу" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск: перчатки, 60 л, чековая..." />
         </div>
 
-        <div className="catalog-grid">
+        <div className="catalog-row">
           {visibleProducts.map((product) => (
             <article className="product-card" key={product.id}>
               <button className={`favorite ${favorites.includes(product.id) ? 'active' : ''}`} type="button" onClick={() => toggleFavorite(product.id)} aria-label="Добавить в избранное">
@@ -514,6 +483,7 @@ function App() {
           <p>Напишите имя и телефон. Мы уточним потребность и подготовим расчет по вашим товарам.</p>
         </div>
         <form className="lead-form" onSubmit={sendLead}>
+          <input name="company" placeholder="Название компании" required />
           <input name="name" placeholder="Ваше имя" required />
           <input name="contact" placeholder="+7 XXX XXX XX XX" required />
           <button type="submit" disabled={leadStatus === 'sending'}>
@@ -528,6 +498,7 @@ function App() {
           <p className="section-label">Контакты</p>
           <h2>DESIVE, Алматы</h2>
           <p>Расходные материалы для бизнеса: перчатки, бумага, пакеты, упаковка и лента.</p>
+          <a className="email-link" href="mailto:Info.desive@gmail.com">Info.desive@gmail.com</a>
         </div>
         <div className="contact-actions">
           <a className="primary" href={`https://wa.me/${phone}`} target="_blank">WhatsApp +7 777 131 18 88</a>

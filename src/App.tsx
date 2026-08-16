@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import './App.css'
 
 type Category = 'all' | 'gloves' | 'paper' | 'bags' | 'labels'
@@ -251,6 +252,16 @@ const products: Product[] = [
 
 const segments = ['Кафе и рестораны', 'Магазины', 'Клиники', 'Доставка еды', 'Клининг', 'Офисы']
 
+const heroSlides = products.slice(0, 4)
+
+const categoryIcons: Record<Category, string> = {
+  all: '•',
+  gloves: 'G',
+  paper: 'P',
+  bags: 'B',
+  labels: 'L',
+}
+
 function formatPrice(price: number | null) {
   return price ? `от ${price.toLocaleString('ru-RU')} тг` : 'цена по запросу'
 }
@@ -260,6 +271,9 @@ function App() {
   const [query, setQuery] = useState('')
   const [cart, setCart] = useState<Cart>({})
   const [favorites, setFavorites] = useState<string[]>([])
+  const [activeSlide, setActiveSlide] = useState(0)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
 
   const visibleProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -273,6 +287,25 @@ function App() {
   const cartItems = products.filter((product) => cart[product.id])
   const cartCount = Object.values(cart).reduce((sum, value) => sum + value, 0)
   const total = cartItems.reduce((sum, product) => sum + (product.price ?? 0) * cart[product.id], 0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length)
+    }, 5000)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!isCartOpen) return
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsCartOpen(false)
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [isCartOpen])
 
   function addToCart(id: string) {
     setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }))
@@ -304,6 +337,50 @@ function App() {
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer')
   }
 
+  function sendLead(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const name = String(data.get('name') ?? '').trim()
+    const contact = String(data.get('contact') ?? '').trim()
+
+    if (!name || !/^\+?\d[\d\s()-]{8,}$/.test(contact)) return
+
+    setLeadStatus('sending')
+    const message = [`Заявка с сайта DESIVE`, `Имя: ${name}`, `Телефон: ${contact}`].join('\n')
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+    window.setTimeout(() => setLeadStatus('sent'), 420)
+  }
+
+  const cartContent = (
+    <>
+      {cartItems.length === 0 ? (
+        <p className="empty">Корзина пока пустая.</p>
+      ) : (
+        <>
+          {cartItems.map((item) => (
+            <div className="cart-row" key={item.id}>
+              <img src={item.image} alt={item.name} />
+              <div>
+                <strong>{item.name}</strong>
+                <span>{formatPrice(item.price)}</span>
+              </div>
+              <div className="quantity">
+                <button type="button" onClick={() => changeQuantity(item.id, -1)}>-</button>
+                <span>{cart[item.id]}</span>
+                <button type="button" onClick={() => changeQuantity(item.id, 1)}>+</button>
+              </div>
+            </div>
+          ))}
+          <div className="cart-total">
+            <span>Ориентировочно</span>
+            <strong>{total ? `${total.toLocaleString('ru-RU')} тг` : 'по запросу'}</strong>
+          </div>
+          <button className="checkout" type="button" onClick={() => openWhatsApp()}>Отправить заказ</button>
+        </>
+      )}
+    </>
+  )
+
   return (
     <main>
       <header className="site-header">
@@ -313,7 +390,7 @@ function App() {
           <a href="#delivery">Доставка</a>
           <a href="#contacts">Контакты</a>
         </nav>
-        <button className="cart-pill" type="button" onClick={() => document.getElementById('cart')?.scrollIntoView({ behavior: 'smooth' })}>
+        <button className="cart-pill" type="button" onClick={() => setIsCartOpen(true)}>
           Корзина · {cartCount}
         </button>
       </header>
@@ -331,19 +408,39 @@ function App() {
             <button className="secondary" type="button" onClick={() => openWhatsApp()}>Написать в WhatsApp</button>
           </div>
         </div>
-        <div className="hero-showcase">
-          {products.slice(0, 4).map((product) => (
-            <img key={product.id} src={product.image} alt={product.name} />
+        <div className="hero-slider">
+          {heroSlides.map((product, index) => (
+            <img
+              key={product.id}
+              className={index === activeSlide ? 'active' : ''}
+              src={product.image}
+              alt={product.name}
+            />
           ))}
+          <div className="hero-dots" aria-label="Слайды">
+            {heroSlides.map((product, index) => (
+              <button
+                key={product.id}
+                className={index === activeSlide ? 'active' : ''}
+                type="button"
+                onClick={() => setActiveSlide(index)}
+                aria-label={`Показать слайд ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="category-strip" aria-label="Категории">
-        {(Object.keys(categories) as Category[]).map((category) => (
-          <button key={category} className={active === category ? 'active' : ''} type="button" onClick={() => setActive(category)}>
-            {categories[category]}
-          </button>
-        ))}
+      <section className="category-island" aria-label="Категории товаров">
+        <p className="section-label">Категории товаров</p>
+        <div>
+          {(Object.keys(categories) as Category[]).map((category) => (
+            <button key={category} className={active === category ? 'active' : ''} type="button" onClick={() => setActive(category)}>
+              <span>{categoryIcons[category]}</span>
+              {categories[category]}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="section catalog-section" id="catalog">
@@ -385,41 +482,6 @@ function App() {
         </div>
       </section>
 
-      <section className="section cart-section" id="cart">
-        <div>
-          <p className="section-label">Корзина</p>
-          <h2>Быстрый заказ</h2>
-          <p>Добавьте позиции и отправьте заявку в WhatsApp. Менеджер уточнит объем, наличие и финальную цену.</p>
-        </div>
-        <div className="cart-panel">
-          {cartItems.length === 0 ? (
-            <p className="empty">Корзина пока пустая.</p>
-          ) : (
-            <>
-              {cartItems.map((item) => (
-                <div className="cart-row" key={item.id}>
-                  <img src={item.image} alt={item.name} />
-                  <div>
-                    <strong>{item.name}</strong>
-                    <span>{formatPrice(item.price)}</span>
-                  </div>
-                  <div className="quantity">
-                    <button type="button" onClick={() => changeQuantity(item.id, -1)}>-</button>
-                    <span>{cart[item.id]}</span>
-                    <button type="button" onClick={() => changeQuantity(item.id, 1)}>+</button>
-                  </div>
-                </div>
-              ))}
-              <div className="cart-total">
-                <span>Ориентировочно</span>
-                <strong>{total ? `${total.toLocaleString('ru-RU')} тг` : 'по запросу'}</strong>
-              </div>
-              <button className="checkout" type="button" onClick={() => openWhatsApp()}>Отправить заказ</button>
-            </>
-          )}
-        </div>
-      </section>
-
       <section className="section info-grid" id="delivery">
         <article>
           <span>01</span>
@@ -445,6 +507,22 @@ function App() {
         </div>
       </section>
 
+      <section className="section lead-section">
+        <div>
+          <p className="section-label">Заявка</p>
+          <h2>Оставить заявку</h2>
+          <p>Напишите имя и телефон. Мы уточним потребность и подготовим расчет по вашим товарам.</p>
+        </div>
+        <form className="lead-form" onSubmit={sendLead}>
+          <input name="name" placeholder="Ваше имя" required />
+          <input name="contact" placeholder="+7 XXX XXX XX XX" required />
+          <button type="submit" disabled={leadStatus === 'sending'}>
+            {leadStatus === 'sending' ? 'Отправляем...' : 'Отправить заявку'}
+          </button>
+          {leadStatus === 'sent' && <span>Заявка открыта в WhatsApp.</span>}
+        </form>
+      </section>
+
       <section className="section contacts" id="contacts">
         <div>
           <p className="section-label">Контакты</p>
@@ -463,6 +541,22 @@ function App() {
       </footer>
 
       <a className="whatsapp" href={`https://wa.me/${phone}`} target="_blank" aria-label="Открыть WhatsApp">WA</a>
+
+      {isCartOpen && (
+        <div className="drawer-overlay" onClick={() => setIsCartOpen(false)}>
+          <aside className="cart-drawer" onClick={(event) => event.stopPropagation()} aria-label="Корзина">
+            <div className="drawer-head">
+              <div>
+                <p className="section-label">Корзина</p>
+                <h2>Быстрый заказ</h2>
+              </div>
+              <button type="button" onClick={() => setIsCartOpen(false)} aria-label="Закрыть корзину">×</button>
+            </div>
+            <p className="drawer-text">Отправьте позиции в WhatsApp. Менеджер уточнит объем, наличие и финальную цену.</p>
+            <div className="cart-panel">{cartContent}</div>
+          </aside>
+        </div>
+      )}
     </main>
   )
 }

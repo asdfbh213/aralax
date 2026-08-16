@@ -35,7 +35,7 @@ const products: Product[] = [
     image: '/images/products/black-vinyl-nitrile-gloves.jpg',
     price: 1100,
     unit: 'упаковка',
-    pack: '100 шт · один размер',
+    pack: '100 шт · размеры S, M, L',
     badge: 'Powder free',
   },
   {
@@ -45,7 +45,7 @@ const products: Product[] = [
     image: '/images/products/blue-vinyl-nitrile-gloves.jpg',
     price: 1100,
     unit: 'упаковка',
-    pack: '100 шт · один размер',
+    pack: '100 шт · размеры S, M, L',
     badge: 'Latex free',
   },
   {
@@ -55,7 +55,7 @@ const products: Product[] = [
     image: '/images/products/verde-vita-black-gloves.jpg',
     price: 1100,
     unit: 'упаковка',
-    pack: '100 шт · один размер',
+    pack: '100 шт · размеры S, M, L',
     badge: 'Универсальные',
   },
   {
@@ -65,7 +65,7 @@ const products: Product[] = [
     image: '/images/products/prime-med-nitrile-gloves.jpg',
     price: 1800,
     unit: 'упаковка',
-    pack: '100 шт · размер M',
+    pack: '100 шт · размеры S, M, L',
     badge: 'EN ISO',
   },
   {
@@ -75,7 +75,7 @@ const products: Product[] = [
     image: '/images/products/mediok-nitrile-gloves.jpg',
     price: 2200,
     unit: 'упаковка',
-    pack: '50 пар · размер M',
+    pack: '50 пар · размеры S, M, L',
     badge: 'AQL 1.5',
   },
   {
@@ -85,7 +85,7 @@ const products: Product[] = [
     image: '/images/products/latex-household-gloves.jpg',
     price: 2600,
     unit: '10 пар',
-    pack: '90-100 грамм · желтые',
+    pack: '90-100 грамм · размеры S, M, L',
     badge: 'Плотные',
   },
   {
